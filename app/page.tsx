@@ -18,13 +18,14 @@ export default function HomBoxLanding() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Updated to cheaper home appliances in Naira
   const products = [
-    { id: 1, name: "Smart French Door Refrigerator", price: "$1,899", rating: 4.9, image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800" },
-    { id: 2, name: "UltraQuiet Front Load Washer", price: "$749", rating: 4.8, image: "https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&q=80&w=800" },
-    { id: 3, name: "Pro-Style Gas Range Stove", price: "$2,100", rating: 5.0, image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&q=80&w=800" },
-    { id: 4, name: "RoboVac Elite Series", price: "$399", rating: 4.7, image: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&q=80&w=800" },
-    { id: 5, name: "Premium Espresso Machine", price: "$599", rating: 4.9, image: "https://images.unsplash.com/photo-1520286820063-47525fc9e198?auto=format&fit=crop&q=80&w=800" },
-    { id: 6, name: "Smart Air Purifier Pro", price: "$249", rating: 4.8, image: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?auto=format&fit=crop&q=80&w=800" },
+    { id: 1, name: "Electric Stainless Steel Kettle", price: "₦8,500", rating: 4.8, image: "https://images.unsplash.com/photo-1590756254033-29d411910b41?auto=format&fit=crop&q=80&w=800" },
+    { id: 2, name: "Non-Stick Steam Iron", price: "₦12,000", rating: 4.6, image: "https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&q=80&w=800" },
+    { id: 3, name: "2-Slice Pop-up Toaster", price: "₦15,000", rating: 4.9, image: "https://images.unsplash.com/photo-1531737212413-667205e1cda7?auto=format&fit=crop&q=80&w=800" },
+    { id: 4, name: "Table Top Blender 1.5L", price: "₦22,500", rating: 4.7, image: "https://images.unsplash.com/photo-1585237432869-7eddf9e25d21?auto=format&fit=crop&q=80&w=800" },
+    { id: 5, name: "20L Microwave Oven", price: "₦45,000", rating: 4.9, image: "https://images.unsplash.com/photo-1585237433285-d601b3336bb3?auto=format&fit=crop&q=80&w=800" },
+    { id: 6, name: "16-Inch Standing Fan", price: "₦35,000", rating: 4.8, image: "https://images.unsplash.com/photo-1565514220078-7541b0b52d24?auto=format&fit=crop&q=80&w=800" },
   ];
 
   return (
@@ -51,7 +52,7 @@ export default function HomBoxLanding() {
         }
       `}} />
 
-      {/* STRONGER BACKGROUND GRADIENTS: Placed directly behind the nav to force the water refraction effect to show */}
+      {/* STRONGER BACKGROUND GRADIENTS */}
       <div className="fixed top-[-5%] left-[5%] w-[40vw] h-[40vw] bg-cyan-300/40 rounded-full blur-[100px] opacity-80 -z-10 pointer-events-none" />
       <div className="fixed top-[5%] right-[5%] w-[35vw] h-[35vw] bg-purple-300/40 rounded-full blur-[100px] opacity-80 -z-10 pointer-events-none" />
       <div className="fixed bottom-[-10%] left-[20%] w-[60vw] h-[60vw] bg-indigo-200/40 rounded-full blur-[120px] opacity-60 -z-10 pointer-events-none" />
@@ -62,8 +63,8 @@ export default function HomBoxLanding() {
           flex items-center justify-between transition-all duration-700 ease-in-out
           
           /* THE MAGIC CLEAR WATER FORMULA */
-          bg-transparent backdrop-blur-[0px] backdrop-saturate-[200%] 
-          border border-white/20 border-[3px] shadow-[0_10px_39px_rgba(0,0,0,0.04)]
+          bg-transparent backdrop-blur-[24px] backdrop-saturate-[200%] 
+          border border-white/20 shadow-[0_10px_39px_rgba(0,0,0,0.04)]
           
           ${isScrolled 
             ? 'w-full max-w-5xl h-20 rounded-full px-8' 
@@ -76,6 +77,7 @@ export default function HomBoxLanding() {
               src="/logo.jpeg" 
               alt="HomBox Logo" 
               className={`w-auto object-contain transition-all duration-500 ${isScrolled ? 'h-12' : 'h-16'}`} 
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
           </div>
 
@@ -129,11 +131,12 @@ export default function HomBoxLanding() {
       {/* Showcase Feature */}
       <section className="py-24 px-6 max-w-6xl mx-auto">
         <div className="relative rounded-[3rem] p-4 bg-white/20 backdrop-blur-3xl backdrop-saturate-[1.5] border border-white/40 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] overflow-hidden transition-transform duration-700 hover:scale-[1.02]">
-          <div className="rounded-[2.5rem] overflow-hidden relative h-[500px] md:h-[700px]">
+          <div className="rounded-[2.5rem] overflow-hidden relative h-[500px] md:h-[700px] bg-slate-200">
             <img 
               src="https://images.unsplash.com/photo-1556910103-1c02745a872f?auto=format&fit=crop&q=80&w=2000" 
               alt="Modern Kitchen Showcase" 
               className="w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
             {/* Hovering Glass UI inside image */}
             <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-[30px] backdrop-saturate-[2] px-8 py-5 rounded-[2rem] flex gap-6 shadow-[0_20px_40px_rgba(0,0,0,0.2)] border border-white/20">
@@ -159,31 +162,43 @@ export default function HomBoxLanding() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {products.map((product) => (
-            <div key={product.id} className="group relative bg-transparent backdrop-blur-2xl backdrop-saturate-[1.5] border border-white/50 rounded-[2.5rem] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:bg-white/10 hover:border-blue-500/30 transition-all duration-500">
+            <div key={product.id} className="group relative bg-transparent backdrop-blur-2xl backdrop-saturate-[1.5] border border-white/50 rounded-[2.5rem] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:bg-white/10 hover:border-blue-500/30 transition-all duration-500 z-10">
               {/* Product Image Box */}
               <div className="relative rounded-[2rem] overflow-hidden h-72 mb-6 bg-slate-100 flex items-center justify-center">
-                <img src={product.image} alt={product.name} className="w-full h-full object-cover mix-blend-multiply group-hover:scale-110 transition-transform duration-700" />
+                <img 
+                  src={product.image} 
+                  alt={product.name} 
+                  className="w-full h-full object-cover mix-blend-multiply group-hover:scale-110 transition-transform duration-700"
+                  onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1556910103-1c02745a872f?auto=format&fit=crop&q=80&w=800"; }}
+                />
                 
                 {/* Floating Add to Cart Button on Hover */}
-                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <button className="translate-y-4 group-hover:translate-y-0 transition-all duration-300 bg-white/70 backdrop-blur-xl text-black font-bold px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 hover:bg-black hover:text-white">
+                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                  <button className="translate-y-4 group-hover:translate-y-0 transition-all duration-300 bg-white/70 backdrop-blur-xl text-black font-bold px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 hover:bg-black hover:text-white pointer-events-auto">
                     <ShoppingCart size={18} /> Quick Add
                   </button>
                 </div>
               </div>
               
               {/* Product Info */}
-              <div className="px-3 pb-3">
+              <div className="px-3 pb-3 relative z-20">
                 <div className="flex items-center gap-1 mb-2">
                   <Star size={16} className="text-amber-400 fill-amber-400" />
                   <span className="text-sm font-bold text-slate-700">{product.rating}</span>
                 </div>
                 <h3 className="font-bold text-xl text-slate-900 mb-3 tracking-tight leading-snug">{product.name}</h3>
+                
+                {/* Changed the + button to a Facebook link as requested */}
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-black text-slate-800 tracking-tight">{product.price}</span>
-                  <div className="w-10 h-10 rounded-full bg-white/80 border border-slate-200 flex items-center justify-center text-slate-800 group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 transition-all">
+                  <a 
+                    href="https://facebook.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full bg-white/80 border border-slate-200 flex items-center justify-center text-slate-800 group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 transition-all cursor-pointer shadow-sm hover:shadow-md"
+                  >
                     <span className="font-bold text-xl leading-none">+</span>
-                  </div>
+                  </a>
                 </div>
               </div>
             </div>
@@ -193,7 +208,7 @@ export default function HomBoxLanding() {
 
       {/* Bottom CTA Banner */}
       <section className="py-24 px-6 max-w-6xl mx-auto">
-        <div className="relative bg-cover bg-center rounded-[3rem] overflow-hidden shadow-2xl" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1534081333815-ae5019106622?auto=format&fit=crop&q=80&w=2000')" }}>
+        <div className="relative bg-cover bg-center rounded-[3rem] overflow-hidden shadow-2xl bg-slate-800" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1534081333815-ae5019106622?auto=format&fit=crop&q=80&w=2000')" }}>
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 to-slate-900/50 backdrop-blur-[4px]"></div>
           <div className="relative z-10 py-28 px-8 text-center text-white flex flex-col items-center">
             <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">Ready to upgrade?</h2>
@@ -216,7 +231,7 @@ export default function HomBoxLanding() {
       <footer className="border-t border-slate-200/60 bg-transparent backdrop-blur-2xl pt-16 pb-12 px-6 mt-12 relative z-10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex flex-col items-center md:items-start gap-4">
-             <img src="/logo.jpeg" alt="HomBox Logo" className="h-12 w-auto object-contain rounded-lg drop-shadow-sm grayscale opacity-80" />
+             <img src="/logo.jpeg" alt="HomBox Logo" className="h-12 w-auto object-contain rounded-lg drop-shadow-sm grayscale opacity-80" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
              <span className="text-slate-600 font-medium text-sm tracking-wide">© 2026 HomBox Inc. All rights reserved.</span>
           </div>
           
