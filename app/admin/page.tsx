@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
   LayoutDashboard, Package, ShoppingCart, Users, Settings, 
-  Plus, Upload, CheckCircle2, AlertCircle, Loader2 
+  Plus, CheckCircle2, AlertCircle, Loader2 
 } from 'lucide-react';
+
 
 
 export default function AdminDashboard() {
@@ -37,24 +38,24 @@ export default function AdminDashboard() {
       const numericPrice = parseFloat(formData.price);
       const numericOriginalPrice = parseFloat(formData.original_price);
 
-      // The actual call to insert data into your Supabase database
-      const { error } = await supabase
-        .from('products')
-        .insert([
-          { 
-            name: formData.name, 
-            price: numericPrice, 
-            original_price: numericOriginalPrice, 
-            category: formData.category,
-            image_url: formData.image_url,
-            description: formData.description,
-            stock_count: 100, // Default stock
-            sold_count: 0,
-            rating: 5.0
-          }
-        ]);
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name, 
+          price: numericPrice, 
+          original_price: numericOriginalPrice, 
+          category: formData.category,
+          image_url: formData.image_url,
+          description: formData.description,
+          stock_count: 100,
+          sold_count: 0,
+          rating: 5.0
+        })
+      });
 
-      if (error) throw error;
+      if (!res.ok) throw new Error('Failed to save to database');
+
 
       setStatus('success');
       // Reset form on success
@@ -65,10 +66,11 @@ export default function AdminDashboard() {
       // Clear success message after 3 seconds
       setTimeout(() => setStatus('idle'), 3000);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setStatus('error');
-      setErrorMessage(err.message || "Failed to add product. Check database connection.");
+      const errorMessageString = err instanceof Error ? err.message : String(err);
+      setErrorMessage(errorMessageString || "Failed to add product. Check database connection.");
     } finally {
       setIsSubmitting(false);
     }
@@ -89,9 +91,9 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-600/10 text-red-500 font-bold cursor-pointer transition-colors">
             <Package size={20} /> Products
           </div>
-          <div className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 hover:text-white cursor-pointer transition-colors">
+          <Link href="/admin/orders" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 hover:text-white cursor-pointer transition-colors">
             <ShoppingCart size={20} /> Orders
-          </div>
+          </Link>
           <div className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 hover:text-white cursor-pointer transition-colors">
             <Users size={20} /> Customers
           </div>
@@ -206,8 +208,8 @@ export default function AdminDashboard() {
                   className="w-full border border-gray-300 rounded-xl p-3.5 outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all bg-white"
                 >
                   <option>Consumer Electronics</option>
-                  <option>Women's Clothing</option>
-                  <option>Men's Clothing</option>
+                  <option>Women&apos;s Clothing</option>
+                  <option>Men&apos;s Clothing</option>
                   <option>Home Appliances</option>
                   <option>Beauty & Health</option>
                 </select>

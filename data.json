@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "name": "Luxury Smart Watch Men Women Bluetooth Call Sports Bracelet Fitness Tracker",
+    "price": 8500,
+    "original_price": 25000,
+    "sold_count": 1540,
+    "rating": 4.8,
+    "category": "Consumer Electronics",
+    "description": "Experience the ultimate in smart wearables with this luxury smart watch. Featuring bluetooth call capabilities, fitness tracking, and a premium bracelet design.",
+    "image_url": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    "id": 2,
+    "name": "Wireless Noise Cancelling Earbuds BT5.4 HiFi Sound",
+    "price": 12000,
+    "original_price": 30000,
+    "sold_count": 2100,
+    "rating": 4.9,
+    "category": "Consumer Electronics",
+    "description": "Immerse yourself in crystal clear HiFi sound with these advanced active noise cancelling earbuds featuring the latest Bluetooth 5.4 chip.",
+    "image_url": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    "id": 3,
+    "name": "Men's Casual Slim Fit Oxford Shirt Long Sleeve",
+    "price": 6500,
+    "original_price": 15000,
+    "sold_count": 850,
+    "rating": 4.6,
+    "category": "Men's Clothing",
+    "description": "Premium cotton blend oxford shirt tailored for a modern slim fit. Perfect for business casual environments or weekend outings.",
+    "image_url": "https://images.unsplash.com/photo-1596755094514-f87e32f05e31?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    "id": 4,
+    "name": "Women's Elegant V-Neck Maxi Dress Summer Wear",
+    "price": 9000,
+    "original_price": 18500,
+    "sold_count": 1200,
+    "rating": 4.7,
+    "category": "Women's Clothing",
+    "description": "Beautiful flowing summer maxi dress with a flattering V-neck design. Lightweight breathable fabric perfect for warm weather.",
+    "image_url": "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    "id": 5,
+    "name": "Professional Kitchen Kitchenware Set 14-Piece",
+    "price": 45000,
+    "original_price": 85000,
+    "sold_count": 320,
+    "rating": 4.9,
+    "category": "Home & Garden",
+    "description": "Complete professional grade kitchenware set including non-stick pans, pots, and essential cooking utensils. Built to last a lifetime.",
+    "image_url": "https://images.unsplash.com/photo-1556910110-a5a63dfd393c?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    "id": 6,
+    "name": "Ultra-Thin Wireless Power Bank 10000mAh Mobile Battery",
+    "price": 7500,
+    "original_price": 15000,
+    "sold_count": 3000,
+    "rating": 4.5,
+    "category": "Mobile Accessories",
+    "description": "Keep your devices charged on the go with this incredibly thin wireless power bank. Features 10000mAh capacity and 15W fast wireless charging.",
+    "image_url": "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    "id": 7,
+    "name": "Orthopedic Memory Foam Neck Pillow for Sleep",
+    "price": 5500,
+    "original_price": 12000,
+    "sold_count": 980,
+    "rating": 4.8,
+    "category": "Health & Beauty",
+    "description": "Wake up refreshed with this ergonomic memory foam pillow designed to align your spine and relieve neck pain during sleep.",
+    "image_url": "https://images.unsplash.com/photo-1584984240751-2bc72ceaa6d9?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    "id": 8,
+    "name": "LED Desk Lamp with Wireless Charger Dimmable",
+    "price": 8000,
+    "original_price": 20000,
+    "sold_count": 1450,
+    "rating": 4.7,
+    "category": "Home Lighting",
+    "description": "Modern minimalist desk lamp featuring eye-caring LED technology, 3 color modes, and a built-in wireless charging pad for your phone.",
+    "image_url": "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&q=80&w=400"
+  }
+]

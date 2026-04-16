@@ -1,0 +1,19 @@
+[
+  {
+    "id": "ORD-95598424",
+    "date": "April 16, 2026",
+    "status": "Processing",
+    "storeName": "HomBox Verified Shipping",
+    "total": "₦9,500.00",
+    "trackingStep": 1,
+    "items": [
+      {
+        "id": 8,
+        "name": "LED Desk Lamp with Wireless Charger Dimmable",
+        "price": "₦8,000",
+        "image": "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&q=80&w=400",
+        "quantity": 1
+      }
+    ]
+  }
+]

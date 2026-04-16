@@ -2,21 +2,23 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { 
-  ShieldCheck, Lock, CreditCard, Landmark, Truck, 
-  ChevronLeft, CheckCircle2 
-} from 'lucide-react';
+import { ShieldCheck, Lock, CreditCard, Landmark, Truck, ChevronLeft, CheckCircle2, ChevronRight, Check } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
+import { useOrderStore } from '../store/orderStore';
+import { useAuthStore } from '../store/authStore';
 
 export default function CheckoutPage() {
-  const { items, getTotalItems } = useCartStore();
+  const { items, getTotalItems, clearCart } = useCartStore();
+  const addOrder = useOrderStore((state) => state.addOrder);
+  const { user } = useAuthStore();
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [orderId, setOrderId] = useState('');
+  const [activeStep, setActiveStep] = useState(2);
 
   const totalItems = getTotalItems();
 
-  // Calculate Subtotal
   const calculateTotal = () => {
     return items.reduce((total, item) => {
       const numericPrice = parseFloat(item.price.replace(/[^0-9.-]+/g,""));
@@ -25,7 +27,7 @@ export default function CheckoutPage() {
   };
 
   const subtotal = calculateTotal();
-  const shippingFee = subtotal > 0 ? 1500 : 0; // Flat ₦1,500 shipping
+  const shippingFee = subtotal > 0 ? 1500 : 0; 
   const finalTotal = subtotal + shippingFee;
 
   const formatMoney = (amount: number) => {
@@ -36,29 +38,59 @@ export default function CheckoutPage() {
     }).format(amount);
   };
 
-  // Mock Payment Function
-  const handlePayment = (e: React.FormEvent) => {
+  const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
     
-    // Fake a 2-second payment processing delay
-    setTimeout(() => {
-      setIsProcessing(false);
-      setIsSuccess(true);
-      // In a real app, you would call useCartStore.getState().clearCart() here
-    }, 2000);
+    // Simulate payment processing delay
+    await new Promise(r => setTimeout(r, 2000));
+
+    const newOrderId = `ORD-${Math.floor(Math.random() * 90000000) + 10000000}`;
+    const newOrder = {
+      id: newOrderId,
+      date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      status: 'Processing' as const,
+      storeName: 'HomBox Verified Shipping',
+      total: formatMoney(finalTotal),
+      trackingStep: 1,
+      items: items,
+      customerEmail: user?.email,
+      customerName: user?.name,
+    };
+    
+    // Save to local orderStore (browser)
+    addOrder(newOrder);
+    
+    // Save to JSON database (server-side for admin)
+    try {
+      await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder),
+      });
+    } catch (err) {
+      console.error('Failed to persist order to DB:', err);
+    }
+    
+    clearCart();
+    setOrderId(newOrderId);
+    setIsProcessing(false);
+    setIsSuccess(true);
   };
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-[#f2f2f2] flex flex-col items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center animate-in zoom-in duration-500">
-          <CheckCircle2 size={80} className="text-green-500 mx-auto mb-6" />
-          <h1 className="text-3xl font-black text-gray-900 mb-2">Payment Successful!</h1>
-          <p className="text-gray-600 mb-8">Your order has been placed successfully. We will send you a confirmation email shortly.</p>
-          <Link href="/">
-            <button className="w-full bg-black text-white font-bold py-4 rounded-full hover:bg-gray-800 transition-colors">
-              Return to Homepage
+      <div className="min-h-screen bg-[#fafafa] flex flex-col items-center justify-center p-4">
+        <div className="bg-white p-12 rounded-xl shadow-lg max-w-lg w-full text-center animate-in zoom-in duration-500 border border-gray-200">
+          <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-8 border border-green-100">
+            <CheckCircle2 size={40} className="text-green-500" />
+          </div>
+          <h1 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Order Confirmed</h1>
+          <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 mb-4 font-mono text-sm text-gray-700 font-bold">{orderId}</div>
+          <p className="text-gray-500 mb-8 text-sm leading-relaxed">Your order is being processed. A confirmation will be sent to {user?.email || 'your email'}.</p>
+          <Link href="/account">
+            <button className="w-full bg-zinc-900 text-white font-bold py-4 rounded-xl hover:bg-black transition-all shadow-md text-base">
+              Track My Order
             </button>
           </Link>
         </div>
@@ -67,164 +99,201 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f2f2f2] font-sans pb-20">
-      {/* 1. SIMPLE CHECKOUT HEADER */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-[1200px] mx-auto px-4 h-20 flex items-center justify-between">
-          <Link href="/cart" className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors font-medium">
-            <ChevronLeft size={20} /> Back to Cart
+    <div className="min-h-screen bg-[#fafafa] font-sans pb-32">
+      {/* Premium Header */}
+      <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/60 sticky top-0 z-40">
+        <div className="max-w-[1300px] mx-auto px-6 h-24 flex items-center justify-between">
+          <Link href="/cart" className="flex items-center gap-2 text-gray-400 hover:text-gray-900 transition-colors font-bold uppercase tracking-widest text-xs">
+            <ChevronLeft size={16} /> Back to Cart
           </Link>
-          <Link href="/" className="text-2xl font-black tracking-tighter text-red-600">
-            HomBox
+          <Link href="/" className="text-3xl font-black tracking-tighter text-gray-900">
+            HomBox<span className="text-red-500">.</span>
           </Link>
-          <div className="flex items-center gap-2 text-green-600 text-sm font-bold">
-            <Lock size={16} /> Secure Checkout
+          <div className="flex items-center gap-2 text-gray-400 text-xs font-bold tracking-widest uppercase">
+            <Lock size={14} /> Secure
           </div>
         </div>
       </div>
 
-      <div className="max-w-[1200px] mx-auto px-4 mt-8 flex flex-col lg:flex-row gap-8">
+      <div className="max-w-[1300px] mx-auto px-6 mt-12 flex flex-col lg:flex-row gap-12 lg:gap-20">
         
-        {/* LEFT COLUMN: Forms */}
-        <div className="flex-1">
+        {/* LEFT COLUMN: Checkout Flow */}
+        <div className="flex-[1.2]">
+          
+          {/* Visual Stepper */}
+          <div className="flex items-center gap-4 mb-12 text-sm font-bold uppercase tracking-widest">
+             <div className="flex items-center gap-2 text-gray-400">Cart <ChevronRight size={14} /></div>
+             <div className="flex items-center gap-2 text-gray-900">Information <ChevronRight size={14} className="text-gray-400" /></div>
+             <div className="flex items-center gap-2 text-gray-400">Payment</div>
+          </div>
+
           <form onSubmit={handlePayment} id="checkout-form">
             
-            {/* Shipping Address Section */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <span className="bg-gray-900 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
-                Shipping Address
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm font-bold text-gray-700">First Name</label>
-                  <input required type="text" className="border border-gray-300 rounded-lg p-3 focus:border-red-600 outline-none" placeholder="Gideon" />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm font-bold text-gray-700">Last Name</label>
-                  <input required type="text" className="border border-gray-300 rounded-lg p-3 focus:border-red-600 outline-none" placeholder="Ibe" />
-                </div>
-                <div className="flex flex-col gap-1 md:col-span-2">
-                  <label className="text-sm font-bold text-gray-700">Street Address</label>
-                  <input required type="text" className="border border-gray-300 rounded-lg p-3 focus:border-red-600 outline-none" placeholder="123 Startup Avenue" />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm font-bold text-gray-700">City</label>
-                  <input required type="text" className="border border-gray-300 rounded-lg p-3 focus:border-red-600 outline-none" placeholder="Port Harcourt" />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm font-bold text-gray-700">Phone Number</label>
-                  <input required type="tel" className="border border-gray-300 rounded-lg p-3 focus:border-red-600 outline-none" placeholder="+234 800 000 0000" />
-                </div>
-              </div>
+            {/* Express Checkout Options */}
+            <div className="mb-12">
+               <h2 className="text-center text-xs font-bold uppercase tracking-widest text-gray-400 mb-6">Express Checkout</h2>
+               <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1 bg-black text-white h-14 rounded-xl flex items-center justify-center font-bold text-lg cursor-pointer hover:bg-gray-800 transition-colors">
+                     Apple Pay
+                  </div>
+                  <div className="flex-1 bg-[#1A73E8] text-white h-14 rounded-xl flex items-center justify-center font-bold text-lg cursor-pointer hover:bg-[#155DB1] transition-colors">
+                     Google Pay
+                  </div>
+               </div>
+               <div className="relative mt-10 mb-8">
+                 <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200"></div></div>
+                 <div className="relative flex justify-center"><span className="bg-[#fafafa] px-6 text-xs font-bold uppercase tracking-widest text-gray-400">Or pay with card</span></div>
+               </div>
             </div>
 
-            {/* Payment Method Section */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <span className="bg-gray-900 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
-                Payment Method
-              </h2>
-
-              <div className="flex flex-col gap-3">
-                {/* Option: Card */}
-                <label className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'card' ? 'border-red-600 bg-red-50' : 'border-gray-200 hover:bg-gray-50'}`}>
-                  <input type="radio" name="payment" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} className="w-5 h-5 accent-red-600" />
-                  <div className="flex-1">
-                    <div className="font-bold text-gray-900 flex items-center gap-2"><CreditCard size={18}/> Pay with Card (Paystack/Flutterwave)</div>
-                    <div className="text-xs text-gray-500 mt-1">Visa, MasterCard, Verve</div>
-                  </div>
-                </label>
-
-                {/* Option: Bank Transfer */}
-                <label className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'transfer' ? 'border-red-600 bg-red-50' : 'border-gray-200 hover:bg-gray-50'}`}>
-                  <input type="radio" name="payment" checked={paymentMethod === 'transfer'} onChange={() => setPaymentMethod('transfer')} className="w-5 h-5 accent-red-600" />
-                  <div className="flex-1">
-                    <div className="font-bold text-gray-900 flex items-center gap-2"><Landmark size={18}/> Bank Transfer</div>
-                    <div className="text-xs text-gray-500 mt-1">Automated transfer to a dedicated account</div>
-                  </div>
-                </label>
-
-                {/* Option: Pay on Delivery */}
-                <label className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-colors ${paymentMethod === 'pod' ? 'border-red-600 bg-red-50' : 'border-gray-200 hover:bg-gray-50'}`}>
-                  <input type="radio" name="payment" checked={paymentMethod === 'pod'} onChange={() => setPaymentMethod('pod')} className="w-5 h-5 accent-red-600" />
-                  <div className="flex-1">
-                    <div className="font-bold text-gray-900 flex items-center gap-2"><Truck size={18}/> Pay on Delivery</div>
-                    <div className="text-xs text-gray-500 mt-1">Pay with cash or POS when your item arrives</div>
-                  </div>
-                </label>
+            {/* Information Section */}
+            <div className="bg-white rounded-xl p-8 md:p-10 shadow-sm border border-gray-200 mb-8">
+              <div className="flex items-center justify-between mb-8 cursor-pointer group" onClick={() => setActiveStep(1)}>
+                <h2 className="text-xl font-black text-gray-900 tracking-tight">Shipping Information</h2>
+                {activeStep === 2 && <span className="text-sm font-bold text-red-600 hover:text-red-700">Edit</span>}
               </div>
-
-              {/* Fake Card Details Form (Only shows if Card is selected) */}
-              {paymentMethod === 'card' && (
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex flex-col gap-4">
-                    <div>
-                      <label className="text-xs font-bold text-gray-700 uppercase">Card Number</label>
-                      <input type="text" placeholder="0000 0000 0000 0000" className="w-full mt-1 border border-gray-300 rounded p-2.5 outline-none focus:border-red-600 font-mono text-sm" />
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <label className="text-xs font-bold text-gray-700 uppercase">Expiry Date</label>
-                        <input type="text" placeholder="MM/YY" className="w-full mt-1 border border-gray-300 rounded p-2.5 outline-none focus:border-red-600 font-mono text-sm" />
-                      </div>
-                      <div className="flex-1">
-                        <label className="text-xs font-bold text-gray-700 uppercase">CVV</label>
-                        <input type="password" placeholder="123" maxLength={3} className="w-full mt-1 border border-gray-300 rounded p-2.5 outline-none focus:border-red-600 font-mono text-sm" />
-                      </div>
-                    </div>
-                  </div>
+              
+              <div className={`grid grid-cols-1 md:grid-cols-2 gap-5 transition-all duration-300 ${activeStep === 1 ? 'opacity-100 block' : 'opacity-50 pointer-events-none hidden'}`}>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">First Name</label>
+                  <input required type="text" className="border border-gray-200 bg-white rounded-lg p-4 focus:border-gray-900 outline-none transition-colors" defaultValue="Gideon" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Last Name</label>
+                  <input required type="text" className="border border-gray-200 bg-white rounded-lg p-4 focus:border-gray-900 outline-none transition-colors" defaultValue="Ibe" />
+                </div>
+                <div className="flex flex-col gap-2 md:col-span-2">
+                  <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Street Address</label>
+                  <input required type="text" className="border border-gray-200 bg-white rounded-lg p-4 focus:border-gray-900 outline-none transition-colors" defaultValue="123 Startup Avenue" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">City</label>
+                  <input required type="text" className="border border-gray-200 bg-white rounded-lg p-4 focus:border-gray-900 outline-none transition-colors" defaultValue="Port Harcourt" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Phone Number</label>
+                  <input required type="tel" className="border border-gray-200 bg-white rounded-lg p-4 focus:border-gray-900 outline-none transition-colors" defaultValue="+234 800 000 0000" />
+                </div>
+              </div>
+              
+              {activeStep === 2 && (
+                <div className="text-sm font-medium text-gray-600">
+                  Gideon Ibe <br/> 123 Startup Avenue, Port Harcourt <br/> +234 800 000 0000
                 </div>
               )}
+            </div>
+
+            <div className={`bg-white rounded-xl p-8 md:p-10 shadow-sm border border-gray-200 transition-all ${activeStep === 2 ? 'ring-2 ring-gray-900 border-transparent shadow-md' : ''}`}>
+              <h2 className="text-xl font-black text-gray-900 tracking-tight mb-8">Payment Method</h2>
+
+              <div className="flex flex-col gap-4">
+                {/* Credit Card */}
+                <div 
+                  className={`border-2 rounded-2xl overflow-hidden transition-all ${paymentMethod === 'card' ? 'border-gray-900 bg-white' : 'border-gray-100 bg-gray-50/50 hover:border-gray-300 cursor-pointer'}`}
+                  onClick={() => setPaymentMethod('card')}
+                >
+                  <div className="p-6 flex items-center gap-4">
+                     <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${paymentMethod === 'card' ? 'border-gray-900 bg-gray-900' : 'border-gray-300'}`}>
+                       {paymentMethod === 'card' && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                     </div>
+                     <span className="font-bold text-gray-900 text-lg">Credit / Debit Card</span>
+                     <CreditCard size={24} className="ml-auto text-gray-400" />
+                  </div>
+                  {paymentMethod === 'card' && (
+                    <div className="p-6 pt-0 animate-in fade-in slide-in-from-top-4">
+                       {/* Animated Mock Card Graphic */}
+                       <div className="bg-[#111] text-white p-6 rounded-xl mb-8 relative overflow-hidden shadow-md">
+                          <div className="absolute -right-6 -top-6 w-24 h-24 bg-white/5 rounded-full blur-xl"></div>
+                          <div className="flex justify-between items-center mb-6">
+                             <div className="w-10 h-7 bg-white/20 rounded-md backdrop-blur-sm"></div>
+                             <span className="font-black italic text-lg tracking-wider">VISA</span>
+                          </div>
+                          <div className="font-mono text-xl tracking-widest mb-3 opacity-90">•••• •••• •••• 4242</div>
+                          <div className="flex justify-between font-mono text-[10px] uppercase opacity-70">
+                             <span className="tracking-widest">Gideon Ibe</span>
+                             <span className="tracking-widest">12/28</span>
+                          </div>
+                       </div>
+
+                       <div className="grid gap-5">
+                          <div>
+                            <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Card Number</label>
+                            <input type="text" placeholder="0000 0000 0000 0000" className="w-full mt-2 border border-gray-200 rounded-xl p-4 outline-none focus:border-gray-900 font-mono focus:bg-gray-50 transition-colors" />
+                          </div>
+                          <div className="flex gap-5">
+                            <div className="flex-1">
+                              <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Expiry</label>
+                              <input type="text" placeholder="MM/YY" className="w-full mt-2 border border-gray-200 rounded-xl p-4 outline-none focus:border-gray-900 font-mono focus:bg-gray-50 transition-colors" />
+                            </div>
+                            <div className="flex-1">
+                              <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">CVC</label>
+                              <input type="password" placeholder="123" maxLength={3} className="w-full mt-2 border border-gray-200 rounded-xl p-4 outline-none focus:border-gray-900 font-mono focus:bg-gray-50 transition-colors" />
+                            </div>
+                          </div>
+                       </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Bank Transfer */}
+                <div 
+                  className={`border-2 rounded-2xl p-6 flex items-center gap-4 transition-all ${paymentMethod === 'transfer' ? 'border-gray-900 bg-white' : 'border-gray-100 bg-gray-50/50 hover:border-gray-300 cursor-pointer'}`}
+                  onClick={() => setPaymentMethod('transfer')}
+                >
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${paymentMethod === 'transfer' ? 'border-gray-900 bg-gray-900' : 'border-gray-300'}`}>
+                    {paymentMethod === 'transfer' && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                  </div>
+                  <div className="flex-1">
+                    <span className="font-bold text-gray-900 text-lg">Bank Transfer</span>
+                    <p className="text-gray-500 text-sm mt-1">Make an automated transfer via Paystack</p>
+                  </div>
+                  <Landmark size={24} className="text-gray-400" />
+                </div>
+              </div>
 
             </div>
           </form>
         </div>
 
-        {/* RIGHT COLUMN: Order Summary */}
-        <div className="w-full lg:w-[400px] flex-shrink-0">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 sticky top-24">
-            <h2 className="text-lg font-bold mb-4 text-gray-900">Order Summary</h2>
+        {/* RIGHT COLUMN: Floating Summary */}
+        <div className="flex-1 lg:max-w-[400px]">
+          <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-gray-200 sticky top-32">
             
-            {/* Mini Cart Display */}
-            <div className="flex flex-col gap-4 mb-6 max-h-[250px] overflow-y-auto pr-2">
+            <div className="flex items-center justify-between mb-6">
+               <h2 className="text-lg font-black text-gray-900 tracking-tight">Order Summary</h2>
+               <span className="bg-gray-100 text-gray-900 text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-md">{totalItems} items</span>
+            </div>
+            
+            <div className="flex flex-col gap-6 mb-8 max-h-[300px] overflow-y-auto pr-2 hide-scrollbar">
               {items.map(item => (
-                <div key={item.id} className="flex gap-3">
-                  <div className="relative">
-                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded border border-gray-200" />
-                    <span className="absolute -top-2 -right-2 bg-gray-900 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                <div key={item.id} className="flex gap-4 group">
+                  <div className="relative w-20 h-20 shrink-0">
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-xl border border-gray-100 group-hover:scale-105 transition-transform" />
+                    <span className="absolute -top-2 -right-2 bg-gray-900 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-lg">
                       {item.quantity}
                     </span>
                   </div>
-                  <div className="flex flex-col justify-center">
-                    <span className="text-sm text-gray-800 line-clamp-1">{item.name}</span>
-                    <span className="font-bold text-gray-900">{item.price}</span>
+                  <div className="flex flex-col justify-center flex-1">
+                    <span className="text-sm font-bold text-gray-900 line-clamp-2 mb-1">{item.name}</span>
+                    <span className="font-bold text-gray-500">{item.price}</span>
                   </div>
                 </div>
               ))}
             </div>
 
-            <hr className="border-gray-100 mb-4" />
-
-            <div className="flex flex-col gap-3 text-sm text-gray-600 mb-4">
-              <div className="flex justify-between">
-                <span>Subtotal ({totalItems} items)</span>
-                <span className="font-medium text-gray-900">{formatMoney(subtotal)}</span>
+            <div className="bg-gray-50 rounded-2xl p-6 mb-8">
+              <div className="flex justify-between items-center mb-4 text-sm font-medium text-gray-600">
+                <span>Subtotal</span>
+                <span>{formatMoney(subtotal)}</span>
               </div>
-              <div className="flex justify-between">
-                <span>Shipping fee</span>
-                <span className="font-medium text-gray-900">{formatMoney(shippingFee)}</span>
+              <div className="flex justify-between items-center mb-4 text-sm font-medium text-gray-600">
+                <span>Shipping</span>
+                <span>{formatMoney(shippingFee)}</span>
               </div>
-            </div>
-
-            <hr className="border-gray-100 mb-4" />
-
-            <div className="flex justify-between items-end mb-6">
-              <span className="text-gray-900 font-bold">Total</span>
-              <div className="text-right">
-                <span className="text-xs text-gray-500 block">NGN</span>
-                <span className="text-3xl font-black text-red-600">{formatMoney(finalTotal)}</span>
+              <div className="h-px w-full bg-gray-200 mb-4"></div>
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-bold text-gray-900">Total</span>
+                <span className="text-3xl font-black text-gray-900 tracking-tighter">{formatMoney(finalTotal)}</span>
               </div>
             </div>
 
@@ -232,21 +301,23 @@ export default function CheckoutPage() {
               form="checkout-form"
               type="submit"
               disabled={isProcessing || items.length === 0}
-              className="w-full bg-[#ff0000] text-white font-bold py-4 rounded-full hover:bg-red-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+              className="w-full bg-zinc-900 text-white font-bold py-4 rounded-xl hover:bg-black transition-all shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center text-base gap-3 group"
             >
               {isProcessing ? (
-                <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                <>
+                  <div className="w-5 h-5 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Processing...
+                </>
               ) : (
-                `Pay ${formatMoney(finalTotal)}`
+                <>
+                  Pay {formatMoney(finalTotal)} <Lock size={16} className="group-hover:scale-110 transition-transform"/>
+                </>
               )}
             </button>
 
-            <div className="mt-6 flex items-start gap-3 bg-green-50 p-3 rounded-lg border border-green-100">
-              <ShieldCheck size={24} className="text-green-600 shrink-0" />
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Payments are securely processed. We do not store your full card details on our servers.
-              </p>
-            </div>
+            <p className="text-center text-[11px] font-bold text-gray-400 mt-6 uppercase tracking-widest flex justify-center items-center gap-2">
+               <ShieldCheck size={14} /> Secured by 256-bit SSL
+            </p>
           </div>
         </div>
 

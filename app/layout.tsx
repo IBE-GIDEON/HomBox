@@ -4,13 +4,19 @@ import "./globals.css";
 
 import TopHeader from "@/app/components/TopHeader";
 import Navbar from "@/app/components/Navbar";
-import Footer from "@/app/components/Footer"; // 1. IMPORT FOOTER
+import Footer from "@/app/components/Footer"; 
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "HomBox",
-  description: "The everything store, elevated.",
+  title: "HomBox | The Premier Global Marketplace",
+  description: "Shop millions of high-quality products at unbeatable prices. From fashion to electronics, enjoy free shipping and buyer protection worldwide.",
+  openGraph: {
+    title: "HomBox Global Marketplace",
+    description: "Shop millions of high-quality products at unbeatable prices. Enjoy free shipping and buyer protection worldwide.",
+    siteName: 'HomBox',
+  }
 };
 
 export default function RootLayout({
@@ -31,6 +37,7 @@ export default function RootLayout({
 
         {/* 2. PLACE FOOTER HERE */}
         <Footer />
+        <Toaster position="bottom-right" />
       </body>
     </html>
   );

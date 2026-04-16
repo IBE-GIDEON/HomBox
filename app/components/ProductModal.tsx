@@ -28,7 +28,9 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
 
   // Reset quantity and color when a new product is opened
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setModalQuantity(1);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedColor(0);
   }, [product]);
 

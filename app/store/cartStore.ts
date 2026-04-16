@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export interface Product {
   id: number;
@@ -20,33 +21,40 @@ interface CartStore {
   getTotalItems: () => number;
 }
 
-export const useCartStore = create<CartStore>((set, get) => ({
-  items: [],
-  
-  // Now it adds the specific amount the user selected
-  addItem: (product, quantity = 1) => {
-    set((state) => {
-      const existingItem = state.items.find((item) => item.id === product.id);
-      if (existingItem) {
-        return {
-          items: state.items.map((item) =>
-            item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
-          ),
-        };
-      }
-      return { items: [...state.items, { ...product, quantity }] };
-    });
-  },
+export const useCartStore = create<CartStore>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      
+      // Now it adds the specific amount the user selected
+      addItem: (product, quantity = 1) => {
+        set((state) => {
+          const existingItem = state.items.find((item) => item.id === product.id);
+          if (existingItem) {
+            return {
+              items: state.items.map((item) =>
+                item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+              ),
+            };
+          }
+          return { items: [...state.items, { ...product, quantity }] };
+        });
+      },
 
-  removeItem: (productId) => {
-    set((state) => ({
-      items: state.items.filter((item) => item.id !== productId),
-    }));
-  },
+      removeItem: (productId) => {
+        set((state) => ({
+          items: state.items.filter((item) => item.id !== productId),
+        }));
+      },
 
-  clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [] }),
 
-  getTotalItems: () => {
-    return get().items.reduce((total, item) => total + item.quantity, 0);
-  },
-}));
+      getTotalItems: () => {
+        return get().items.reduce((total, item) => total + item.quantity, 0);
+      },
+    }),
+    {
+      name: 'hombox-cart-storage',
+    }
+  )
+);
